@@ -14,10 +14,23 @@ import com.example.spendsense.R
 class BudgetPlanStep1Activity : AppCompatActivity() {
 
     private var selectedSchedule: String = ""
+    private var editMode: Boolean = false
+    private var existingTotal: Double? = null
+    private var existingNeeds: Double? = null
+    private var existingSavings: Double? = null
+    private var existingWants: Double? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_budget_plan_step1)
+
+        // read edit extras
+        editMode = intent.getBooleanExtra("editMode", false)
+        selectedSchedule = intent.getStringExtra("schedule") ?: ""
+        existingTotal = intent.getDoubleExtra("totalBudget", 0.0).takeIf { intent.hasExtra("totalBudget") }
+        existingNeeds = intent.getDoubleExtra("needs", 0.0).takeIf { intent.hasExtra("needs") }
+        existingSavings = intent.getDoubleExtra("savings", 0.0).takeIf { intent.hasExtra("savings") }
+        existingWants = intent.getDoubleExtra("wants", 0.0).takeIf { intent.hasExtra("wants") }
 
         setupScheduleButtons()
         setupNavigationButtons()
@@ -39,6 +52,12 @@ class BudgetPlanStep1Activity : AppCompatActivity() {
                 updateScheduleSelection(schedules, index)
             }
         }
+
+        // preselect if editing
+        if (selectedSchedule.isNotEmpty()) {
+            val idx = scheduleNames.indexOf(selectedSchedule)
+            if (idx >= 0) updateScheduleSelection(schedules, idx)
+        }
     }
 
     private fun updateScheduleSelection(buttons: List<Button>, selectedIndex: Int) {
@@ -59,9 +78,15 @@ class BudgetPlanStep1Activity : AppCompatActivity() {
 
         nextBtn.setOnClickListener {
             if (selectedSchedule.isNotEmpty()) {
-                // Pass selected schedule to next activity
                 val intent = Intent(this, BudgetPlanStep2Activity::class.java)
                 intent.putExtra("schedule", selectedSchedule)
+                if (editMode) {
+                    intent.putExtra("editMode", true)
+                    existingTotal?.let { intent.putExtra("totalBudget", it) }
+                    existingNeeds?.let { intent.putExtra("needs", it) }
+                    existingSavings?.let { intent.putExtra("savings", it) }
+                    existingWants?.let { intent.putExtra("wants", it) }
+                }
                 startActivity(intent)
             } else {
                 Toast.makeText(this, "Please select a schedule", Toast.LENGTH_SHORT).show()
@@ -73,4 +98,3 @@ class BudgetPlanStep1Activity : AppCompatActivity() {
         }
     }
 }
-

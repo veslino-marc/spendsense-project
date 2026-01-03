@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
 
 import com.example.spendsense.budgetplan.BudgetPlanStep1Activity
+import com.example.spendsense.budgetplan.BudgetPlanStep3Activity
 
 class DashboardActivity : AppCompatActivity() {
     private lateinit var userManager: UserManager
@@ -29,6 +30,7 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var savingsAmount: TextView
     private lateinit var wantsAmount: TextView
     private lateinit var budgetProgress: ProgressBar
+    private lateinit var createBudgetBtn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,15 +76,10 @@ class DashboardActivity : AppCompatActivity() {
         setupNavigation()
 
         // Action buttons
-        val createBudgetBtn: Button = findViewById(R.id.createBudgetBtn)
+        createBudgetBtn = findViewById(R.id.createBudgetBtn)
         val addExpenseBtn: Button = findViewById(R.id.addExpenseBtn)
         val addCashBtn: Button = findViewById(R.id.addCashBtn)
         val profileIcon: ImageView = findViewById(R.id.profileIcon)
-
-        // Create Budget Plan button
-        createBudgetBtn.setOnClickListener {
-            startActivity(Intent(this, BudgetPlanStep1Activity::class.java))
-        }
 
         addExpenseBtn.setOnClickListener {
             Toast.makeText(this, "Add Expense - Coming Soon", Toast.LENGTH_SHORT).show()
@@ -164,9 +161,27 @@ class DashboardActivity : AppCompatActivity() {
         val needs = prefs.getString("needs", null)?.toDoubleOrNull()
         val savings = prefs.getString("savings", null)?.toDoubleOrNull()
         val wants = prefs.getString("wants", null)?.toDoubleOrNull()
+        val schedule = prefs.getString("schedule", null)
 
-        if (totalBudget == null || needs == null || savings == null || wants == null) {
-            // No plan yet: keep defaults
+        val hasPlan = totalBudget != null && needs != null && savings != null && wants != null && schedule != null
+
+        createBudgetBtn.text = if (hasPlan) "See budget plan" else "Create a budget plan"
+        createBudgetBtn.setOnClickListener {
+            if (hasPlan) {
+                val intent = Intent(this, BudgetPlanStep3Activity::class.java)
+                intent.putExtra("editMode", true)
+                intent.putExtra("schedule", schedule)
+                intent.putExtra("totalBudget", totalBudget)
+                intent.putExtra("needs", needs)
+                intent.putExtra("savings", savings)
+                intent.putExtra("wants", wants)
+                startActivity(intent)
+            } else {
+                startActivity(Intent(this, BudgetPlanStep1Activity::class.java))
+            }
+        }
+
+        if (!hasPlan) {
             budgetStatusAmount.text = "₱0 / ₱0"
             budgetStatusPercent.text = "0%"
             budgetAlertText.text = "Create a budget plan to start tracking"
@@ -178,7 +193,6 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         val df = java.text.DecimalFormat("#,###")
-        val allocated = needs + savings + wants
         val used = 0.0 // placeholder until expenses are tracked
         val percent = if (totalBudget > 0) ((used / totalBudget) * 100).toInt() else 0
 

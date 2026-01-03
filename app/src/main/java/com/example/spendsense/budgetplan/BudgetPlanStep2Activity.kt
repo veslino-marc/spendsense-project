@@ -15,6 +15,10 @@ import com.example.spendsense.R
 class BudgetPlanStep2Activity : AppCompatActivity() {
 
     private var selectedSchedule: String = ""
+    private var editMode: Boolean = false
+    private var existingNeeds: Double? = null
+    private var existingSavings: Double? = null
+    private var existingWants: Double? = null
     private lateinit var budgetInput: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,8 +27,14 @@ class BudgetPlanStep2Activity : AppCompatActivity() {
 
         // Get the schedule from previous activity
         selectedSchedule = intent.getStringExtra("schedule") ?: ""
+        editMode = intent.getBooleanExtra("editMode", false)
+        val existingTotal = intent.getDoubleExtra("totalBudget", 0.0).takeIf { intent.hasExtra("totalBudget") }
+        existingNeeds = intent.getDoubleExtra("needs", 0.0).takeIf { intent.hasExtra("needs") }
+        existingSavings = intent.getDoubleExtra("savings", 0.0).takeIf { intent.hasExtra("savings") }
+        existingWants = intent.getDoubleExtra("wants", 0.0).takeIf { intent.hasExtra("wants") }
 
         budgetInput = findViewById(R.id.budgetInput)
+        existingTotal?.let { budgetInput.setText(it.toString()) }
 
         setupNavigationButtons()
     }
@@ -52,6 +62,12 @@ class BudgetPlanStep2Activity : AppCompatActivity() {
                 val intent = Intent(this, BudgetPlanStep3Activity::class.java)
                 intent.putExtra("schedule", selectedSchedule)
                 intent.putExtra("totalBudget", budget)
+                if (editMode) {
+                    intent.putExtra("editMode", true)
+                    existingNeeds?.let { intent.putExtra("needs", it) }
+                    existingSavings?.let { intent.putExtra("savings", it) }
+                    existingWants?.let { intent.putExtra("wants", it) }
+                }
                 startActivity(intent)
             } catch (e: NumberFormatException) {
                 Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show()
@@ -63,4 +79,3 @@ class BudgetPlanStep2Activity : AppCompatActivity() {
         }
     }
 }
-

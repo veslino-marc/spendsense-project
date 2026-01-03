@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.spendsense.R
+import com.example.spendsense.DashboardActivity
 import com.example.spendsense.budgetplan.data.BudgetPlan
 import com.example.spendsense.budgetplan.data.BudgetBreakdown
 import java.text.DecimalFormat
@@ -24,6 +25,7 @@ class BudgetPlanStep3Activity : AppCompatActivity() {
 
     private var selectedSchedule: String = ""
     private var totalBudget: Double = 0.0
+    private var editMode: Boolean = false
 
     // UI Components
     private lateinit var needsInput: EditText
@@ -46,8 +48,10 @@ class BudgetPlanStep3Activity : AppCompatActivity() {
         // Get data from previous activity
         selectedSchedule = intent.getStringExtra("schedule") ?: ""
         totalBudget = intent.getDoubleExtra("totalBudget", 0.0)
+        editMode = intent.getBooleanExtra("editMode", false)
 
         initializeUI()
+        prefillIfEditing()
         setupInputListeners()
         setupNavigationButtons()
     }
@@ -73,6 +77,16 @@ class BudgetPlanStep3Activity : AppCompatActivity() {
         addCategoryBtn.setOnClickListener {
             addMoreCategory()
         }
+    }
+
+    private fun prefillIfEditing() {
+        val needsExtra = intent.getDoubleExtra("needs", 0.0).takeIf { intent.hasExtra("needs") }
+        val savingsExtra = intent.getDoubleExtra("savings", 0.0).takeIf { intent.hasExtra("savings") }
+        val wantsExtra = intent.getDoubleExtra("wants", 0.0).takeIf { intent.hasExtra("wants") }
+
+        needsExtra?.let { needsInput.setText(it.toString()) }
+        savingsExtra?.let { savingsInput.setText(it.toString()) }
+        wantsExtra?.let { wantsInput.setText(it.toString()) }
     }
 
     private fun setupInputListeners() {
@@ -117,7 +131,15 @@ class BudgetPlanStep3Activity : AppCompatActivity() {
         finishBtn.setOnClickListener {
             if (validateBudgetAllocation()) {
                 saveBudgetPlan()
-                finish()
+                // if editing, go back to dashboard
+                if (editMode) {
+                    val intent = Intent(this, DashboardActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    finish()
+                }
             }
         }
 
@@ -167,7 +189,7 @@ class BudgetPlanStep3Activity : AppCompatActivity() {
             budgetBreakdown = budgetBreakdown
         )
 
-        // Save to SharedPreferences (can be upgraded to database later)
+        // Save to SharedPreferences (overwrite for edit or create)
         val sharedPref = getSharedPreferences("budget_plans", MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("latest_budget_plan", budgetPlan.toString())
@@ -179,7 +201,6 @@ class BudgetPlanStep3Activity : AppCompatActivity() {
             apply()
         }
 
-        Toast.makeText(this, "Budget plan created successfully!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, if (editMode) "Budget plan updated" else "Budget plan created successfully!", Toast.LENGTH_SHORT).show()
     }
 }
-
