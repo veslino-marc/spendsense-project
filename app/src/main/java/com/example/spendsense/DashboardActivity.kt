@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,15 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var navTrack: ImageView
     private lateinit var navAdd: ImageView
     private lateinit var navRecord: ImageView
+
+    // Budget UI references
+    private lateinit var budgetStatusAmount: TextView
+    private lateinit var budgetStatusPercent: TextView
+    private lateinit var budgetAlertText: TextView
+    private lateinit var needsAmount: TextView
+    private lateinit var savingsAmount: TextView
+    private lateinit var wantsAmount: TextView
+    private lateinit var budgetProgress: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +95,18 @@ class DashboardActivity : AppCompatActivity() {
         profileIcon.setOnClickListener {
             Toast.makeText(this, "Profile - Coming Soon", Toast.LENGTH_SHORT).show()
         }
+
+        // Budget UI references
+        budgetStatusAmount = findViewById(R.id.budgetStatusAmount)
+        budgetStatusPercent = findViewById(R.id.budgetStatusPercent)
+        budgetAlertText = findViewById(R.id.budgetAlertText)
+        needsAmount = findViewById(R.id.needsAmount)
+        savingsAmount = findViewById(R.id.savingsAmount)
+        wantsAmount = findViewById(R.id.wantsAmount)
+        budgetProgress = findViewById(R.id.budgetProgress)
+
+        // Populate budget plan if saved
+        loadBudgetPlan()
     }
 
     private fun setupNavigation() {
@@ -134,5 +156,46 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         builder.show()
+    }
+
+    private fun loadBudgetPlan() {
+        val prefs = getSharedPreferences("budget_plans", MODE_PRIVATE)
+        val totalBudget = prefs.getString("total_budget", null)?.toDoubleOrNull()
+        val needs = prefs.getString("needs", null)?.toDoubleOrNull()
+        val savings = prefs.getString("savings", null)?.toDoubleOrNull()
+        val wants = prefs.getString("wants", null)?.toDoubleOrNull()
+
+        if (totalBudget == null || needs == null || savings == null || wants == null) {
+            // No plan yet: keep defaults
+            budgetStatusAmount.text = "₱0 / ₱0"
+            budgetStatusPercent.text = "0%"
+            budgetAlertText.text = "Create a budget plan to start tracking"
+            budgetProgress.progress = 0
+            needsAmount.text = "₱0"
+            savingsAmount.text = "₱0"
+            wantsAmount.text = "₱0"
+            return
+        }
+
+        val df = java.text.DecimalFormat("#,###")
+        val allocated = needs + savings + wants
+        val used = 0.0 // placeholder until expenses are tracked
+        val percent = if (totalBudget > 0) ((used / totalBudget) * 100).toInt() else 0
+
+        budgetStatusAmount.text = "₱${df.format(used)} / ₱${df.format(totalBudget)}"
+        budgetStatusPercent.text = "$percent%"
+        budgetProgress.progress = percent.coerceIn(0, 100)
+
+        needsAmount.text = "₱${df.format(needs)}"
+        savingsAmount.text = "₱${df.format(savings)}"
+        wantsAmount.text = "₱${df.format(wants)}"
+
+        // Alert message
+        val alertText = when {
+            percent >= 90 -> "Budget Alert: You've used $percent% of your budget"
+            percent >= 75 -> "Heads up: $percent% of your budget used"
+            else -> "You're on track with your budget"
+        }
+        budgetAlertText.text = alertText
     }
 }
