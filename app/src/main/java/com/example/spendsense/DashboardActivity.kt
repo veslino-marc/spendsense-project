@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -31,6 +32,7 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var wantsAmount: TextView
     private lateinit var budgetProgress: ProgressBar
     private lateinit var createBudgetBtn: Button
+    private lateinit var customCategoriesDisplay: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,6 +103,7 @@ class DashboardActivity : AppCompatActivity() {
         savingsAmount = findViewById(R.id.savingsAmount)
         wantsAmount = findViewById(R.id.wantsAmount)
         budgetProgress = findViewById(R.id.budgetProgress)
+        customCategoriesDisplay = findViewById(R.id.customCategoriesDisplay)
 
         // Populate budget plan if saved
         loadBudgetPlan()
@@ -189,6 +192,7 @@ class DashboardActivity : AppCompatActivity() {
             needsAmount.text = "₱0"
             savingsAmount.text = "₱0"
             wantsAmount.text = "₱0"
+            customCategoriesDisplay.removeAllViews()
             return
         }
 
@@ -204,6 +208,9 @@ class DashboardActivity : AppCompatActivity() {
         savingsAmount.text = "₱${df.format(savings)}"
         wantsAmount.text = "₱${df.format(wants)}"
 
+        // Load and display custom categories
+        loadCustomCategories(prefs)
+
         // Alert message
         val alertText = when {
             percent >= 90 -> "Budget Alert: You've used $percent% of your budget"
@@ -211,5 +218,79 @@ class DashboardActivity : AppCompatActivity() {
             else -> "You're on track with your budget"
         }
         budgetAlertText.text = alertText
+    }
+
+    private fun loadCustomCategories(prefs: android.content.SharedPreferences) {
+        customCategoriesDisplay.removeAllViews()
+        val customCategoriesJson = prefs.getString("custom_categories", "{}")
+
+        if (customCategoriesJson == null || customCategoriesJson == "{}") {
+            return
+        }
+
+        // Simple JSON parsing for custom categories
+        try {
+            val customMap = parseCustomCategoriesJson(customCategoriesJson)
+            val df = java.text.DecimalFormat("#,###")
+
+            for ((categoryName, amount) in customMap) {
+                val categoryLayout = LinearLayout(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { setMargins(0, 6, 0, 6) }
+                    orientation = LinearLayout.HORIZONTAL
+                }
+
+                val categoryLabel = TextView(this).apply {
+                    text = categoryName
+                    textSize = 14f
+                    setTextColor(getColor(R.color.dark_bg))
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                }
+
+                val categoryAmount = TextView(this).apply {
+                    text = "₱${df.format(amount)}"
+                    textSize = 14f
+                    setTextColor(getColor(R.color.dark_bg))
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                }
+
+                categoryLayout.addView(categoryLabel)
+                categoryLayout.addView(categoryAmount)
+                customCategoriesDisplay.addView(categoryLayout)
+            }
+        } catch (e: Exception) {
+            // If JSON parsing fails, just skip custom categories
+        }
+    }
+
+    private fun parseCustomCategoriesJson(json: String): Map<String, Double> {
+        val result = mutableMapOf<String, Double>()
+
+        // Remove braces
+        var content = json.trim().removePrefix("{").removeSuffix("}")
+
+        if (content.isEmpty()) return result
+
+        // Split by commas (basic parsing)
+        val pairs = content.split(",")
+        for (pair in pairs) {
+            try {
+                val parts = pair.split(":")
+                if (parts.size == 2) {
+                    val key = parts[0].trim().removeSurrounding("\"")
+                    val value = parts[1].trim().toDoubleOrNull() ?: 0.0
+                    result[key] = value
+                }
+            } catch (e: Exception) {
+                // Skip malformed pairs
+            }
+        }
+
+        return result
     }
 }

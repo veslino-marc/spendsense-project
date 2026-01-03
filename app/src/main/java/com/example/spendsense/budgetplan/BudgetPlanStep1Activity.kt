@@ -32,8 +32,18 @@ class BudgetPlanStep1Activity : AppCompatActivity() {
         existingSavings = intent.getDoubleExtra("savings", 0.0).takeIf { intent.hasExtra("savings") }
         existingWants = intent.getDoubleExtra("wants", 0.0).takeIf { intent.hasExtra("wants") }
 
+        // Load session data if not in edit mode
+        if (!editMode && selectedSchedule.isEmpty()) {
+            loadSessionData()
+        }
+
         setupScheduleButtons()
         setupNavigationButtons()
+    }
+
+    private fun loadSessionData() {
+        val prefs = getSharedPreferences("budget_session", MODE_PRIVATE)
+        selectedSchedule = prefs.getString("session_schedule", "") ?: ""
     }
 
     private fun setupScheduleButtons() {
@@ -78,6 +88,13 @@ class BudgetPlanStep1Activity : AppCompatActivity() {
 
         nextBtn.setOnClickListener {
             if (selectedSchedule.isNotEmpty()) {
+                // Save to session
+                val prefs = getSharedPreferences("budget_session", MODE_PRIVATE)
+                with(prefs.edit()) {
+                    putString("session_schedule", selectedSchedule)
+                    apply()
+                }
+
                 val intent = Intent(this, BudgetPlanStep2Activity::class.java)
                 intent.putExtra("schedule", selectedSchedule)
                 if (editMode) {

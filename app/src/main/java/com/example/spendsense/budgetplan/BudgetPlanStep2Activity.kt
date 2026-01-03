@@ -34,7 +34,18 @@ class BudgetPlanStep2Activity : AppCompatActivity() {
         existingWants = intent.getDoubleExtra("wants", 0.0).takeIf { intent.hasExtra("wants") }
 
         budgetInput = findViewById(R.id.budgetInput)
-        existingTotal?.let { budgetInput.setText(it.toString()) }
+
+        if (existingTotal != null) {
+            budgetInput.setText(existingTotal.toString())
+        } else if (!editMode) {
+            // load draft from session
+            val prefs = getSharedPreferences("budget_session", MODE_PRIVATE)
+            if (selectedSchedule.isEmpty()) {
+                selectedSchedule = prefs.getString("session_schedule", "") ?: ""
+            }
+            val sessionTotal = prefs.getString("session_total", null)?.toDoubleOrNull()
+            sessionTotal?.let { budgetInput.setText(it.toString()) }
+        }
 
         setupNavigationButtons()
     }
@@ -58,6 +69,14 @@ class BudgetPlanStep2Activity : AppCompatActivity() {
                     return@setOnClickListener
                 }
 
+                // Save draft to session
+                val prefs = getSharedPreferences("budget_session", MODE_PRIVATE)
+                with(prefs.edit()) {
+                    putString("session_schedule", selectedSchedule)
+                    putString("session_total", budget.toString())
+                    apply()
+                }
+
                 // Pass schedule and budget to next activity
                 val intent = Intent(this, BudgetPlanStep3Activity::class.java)
                 intent.putExtra("schedule", selectedSchedule)
@@ -75,6 +94,16 @@ class BudgetPlanStep2Activity : AppCompatActivity() {
         }
 
         backBtn.setOnClickListener {
+            // Save draft before leaving so user can return without losing data
+            val budgetAmount = budgetInput.text.toString().trim()
+            val prefs = getSharedPreferences("budget_session", MODE_PRIVATE)
+            with(prefs.edit()) {
+                putString("session_schedule", selectedSchedule)
+                if (budgetAmount.isNotEmpty()) {
+                    putString("session_total", budgetAmount)
+                }
+                apply()
+            }
             finish()
         }
     }
