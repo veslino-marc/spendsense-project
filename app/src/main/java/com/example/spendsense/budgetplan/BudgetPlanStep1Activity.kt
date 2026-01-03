@@ -60,11 +60,16 @@ class BudgetPlanStep1Activity : AppCompatActivity() {
         schedules.forEachIndexed { index, button ->
             button.setOnClickListener {
                 selectedSchedule = scheduleNames[index]
+                // persist immediately so returning keeps highlight
+                getSharedPreferences("budget_session", MODE_PRIVATE)
+                    .edit()
+                    .putString("session_schedule", selectedSchedule)
+                    .apply()
                 updateScheduleSelection(schedules, index)
             }
         }
 
-        // preselect if editing
+        // preselect if editing or session draft
         if (selectedSchedule.isNotEmpty()) {
             val idx = scheduleNames.indexOf(selectedSchedule)
             if (idx >= 0) updateScheduleSelection(schedules, idx)
@@ -72,13 +77,40 @@ class BudgetPlanStep1Activity : AppCompatActivity() {
     }
 
     private fun updateScheduleSelection(buttons: List<Button>, selectedIndex: Int) {
-        val selectedTint = ContextCompat.getColorStateList(this, R.color.link_green)
-        val unselectedTint = ContextCompat.getColorStateList(this, R.color.primary_green)
+        // Colors
+        val green = ContextCompat.getColor(this, R.color.link_green)
+        val white = ContextCompat.getColor(this, android.R.color.white)
+        val dark = ContextCompat.getColor(this, R.color.dark_bg)
+
+        // Helper to convert dp to px
+        fun dpToPx(dp: Float): Float {
+            return dp * resources.displayMetrics.density
+        }
+
+        val radiusPx = dpToPx(10f)
+        val strokePx = dpToPx(2f).toInt()
 
         buttons.forEachIndexed { index, button ->
-            button.background = ContextCompat.getDrawable(this, R.drawable.budget_button_background)
-            button.backgroundTintList = if (index == selectedIndex) selectedTint else unselectedTint
-            button.setTextColor(ContextCompat.getColor(this, R.color.dark_bg))
+            if (index == selectedIndex) {
+                // Selected: green fill with white outline
+                val selectedDrawable = android.graphics.drawable.GradientDrawable().apply {
+                    shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    cornerRadius = radiusPx
+                    setColor(green)
+                    setStroke(strokePx, white)
+                }
+                button.background = selectedDrawable
+                button.setTextColor(dark)
+            } else {
+                // Unselected: white fill, no stroke
+                val unselectedDrawable = android.graphics.drawable.GradientDrawable().apply {
+                    shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                    cornerRadius = radiusPx
+                    setColor(white)
+                }
+                button.background = unselectedDrawable
+                button.setTextColor(dark)
+            }
         }
     }
 
