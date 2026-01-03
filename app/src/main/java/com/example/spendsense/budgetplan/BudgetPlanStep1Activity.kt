@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.spendsense.R
 
 /**
@@ -71,14 +72,13 @@ class BudgetPlanStep1Activity : AppCompatActivity() {
     }
 
     private fun updateScheduleSelection(buttons: List<Button>, selectedIndex: Int) {
+        val selectedTint = ContextCompat.getColorStateList(this, R.color.link_green)
+        val unselectedTint = ContextCompat.getColorStateList(this, R.color.primary_green)
+
         buttons.forEachIndexed { index, button ->
-            if (index == selectedIndex) {
-                button.isSelected = true
-                button.setBackgroundColor(getColor(android.R.color.holo_green_light))
-            } else {
-                button.isSelected = false
-                button.setBackgroundColor(getColor(R.color.primary_green))
-            }
+            button.background = ContextCompat.getDrawable(this, R.drawable.budget_button_background)
+            button.backgroundTintList = if (index == selectedIndex) selectedTint else unselectedTint
+            button.setTextColor(ContextCompat.getColor(this, R.color.dark_bg))
         }
     }
 

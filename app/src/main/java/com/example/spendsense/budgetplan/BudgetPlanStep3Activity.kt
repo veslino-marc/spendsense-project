@@ -27,6 +27,11 @@ class BudgetPlanStep3Activity : AppCompatActivity() {
     private var totalBudget: Double = 0.0
     private var editMode: Boolean = false
 
+    // Draft cache for create mode
+    private var draftNeeds: Double? = null
+    private var draftSavings: Double? = null
+    private var draftWants: Double? = null
+
     // UI Components
     private lateinit var needsInput: EditText
     private lateinit var savingsInput: EditText
@@ -53,10 +58,6 @@ class BudgetPlanStep3Activity : AppCompatActivity() {
         selectedSchedule = intent.getStringExtra("schedule") ?: ""
         totalBudget = intent.getDoubleExtra("totalBudget", 0.0)
         editMode = intent.getBooleanExtra("editMode", false)
-
-        var draftNeeds: Double? = null
-        var draftSavings: Double? = null
-        var draftWants: Double? = null
 
         if (!editMode) {
             // Load draft if present
@@ -281,22 +282,18 @@ class BudgetPlanStep3Activity : AppCompatActivity() {
         finishBtn.setOnClickListener {
             if (validateBudgetAllocation()) {
                 saveBudgetPlan()
-                // if editing, go back to dashboard
-                if (editMode) {
-                    val intent = Intent(this, DashboardActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(intent)
-                    finish()
-                } else {
-                    // clear draft
+                // go to dashboard after saving
+                val intent = Intent(this, DashboardActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+                if (!editMode) {
                     clearSessionDraft()
-                    finish()
                 }
+                finish()
             }
         }
 
         backBtn.setOnClickListener {
-            // Save draft for create mode
             if (!editMode) saveSessionDraft()
             finish()
         }
