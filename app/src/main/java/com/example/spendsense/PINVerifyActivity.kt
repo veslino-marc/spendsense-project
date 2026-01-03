@@ -85,6 +85,7 @@ class PINVerifyActivity : AppCompatActivity() {
         }
     }
 
+    @Suppress("MissingSuperCall")
     override fun onBackPressed() {
         // Prevent back button to force PIN entry
         Toast.makeText(this, "Please enter PIN to continue", Toast.LENGTH_SHORT).show()

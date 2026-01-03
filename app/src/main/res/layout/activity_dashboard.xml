@@ -106,6 +106,7 @@
                     android:layout_marginEnd="15dp" />
 
                 <TextView
+                    android:id="@+id/budgetAlertText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -162,35 +163,131 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
-                    android:background="@drawable/progress_background"
-                    android:layout_marginBottom="10dp">
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/progress_background">
 
-                    <View
-                        android:layout_width="0dp"
+                    <ProgressBar
+                        android:id="@+id/budgetProgress"
+                        style="@android:style/Widget.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="0.85"
-                        android:background="@color/link_green" />
+                        android:progressDrawable="@drawable/progress_background"
+                        android:progressTint="@color/link_green"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="0" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
 
                     <TextView
+                        android:id="@+id/budgetStatusAmount"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="₱7,500 / ₱8,000"
+                        android:text="₱0 / ₱0"
                         android:textSize="14sp"
                         android:textColor="@color/dark_bg" />
 
                     <TextView
+                        android:id="@+id/budgetStatusPercent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="85%"
+                        android:text="0%"
                         android:textSize="14sp"
                         android:textColor="@color/dark_bg"
                         android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Breakdown rows -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:divider="@android:color/transparent"
+                    android:showDividers="middle">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Needs"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg" />
+
+                        <TextView
+                            android:id="@+id/needsAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="₱0"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Savings"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg" />
+
+                        <TextView
+                            android:id="@+id/savingsAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="₱0"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Wants"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg" />
+
+                        <TextView
+                            android:id="@+id/wantsAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="₱0"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg" />
+                    </LinearLayout>
+
+                    <!-- Custom Categories Container -->
+                    <LinearLayout
+                        android:id="@+id/customCategoriesDisplay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="10dp" />
                 </LinearLayout>
             </LinearLayout>
 
