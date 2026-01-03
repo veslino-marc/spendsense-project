@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/dark_bg">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary_green"
+        android:padding="15dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/logo_spendsense"
+            android:contentDescription="Logo"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_bg"
+            android:layout_weight="2"
+            android:gravity="center" />
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_settings"
+            android:contentDescription="Settings"
+            android:layout_weight="1"
+            android:gravity="end" />
+    </LinearLayout>
+
+    <!-- Main Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Set up a plan 3"
+                android:textSize="14sp"
+                android:textColor="@color/placeholder"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Main Content Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_background"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:layout_marginBottom="30dp">
+
+                <!-- Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="20dp">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/logo_spendsense"
+                        android:contentDescription="Logo" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="SpendSense"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/dark_bg"
+                        android:layout_marginStart="10dp" />
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/ic_settings"
+                        android:contentDescription="Settings" />
+                </LinearLayout>
+
+                <!-- Divider Line -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/primary_green"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Section Title -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Budget Breakdown"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/dark_bg"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Budget Status Line -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="15dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Total Budget"
+                        android:textSize="14sp"
+                        android:textColor="@color/dark_bg" />
+
+                    <TextView
+                        android:id="@+id/totalBudgetDisplay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₱0.00 / ₱0.00"
+                        android:textSize="14sp"
+                        android:textColor="@color/dark_bg"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Category Tabs -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center">
+
+                    <Button
+                        android:id="@+id/needsTab"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="Needs"
+                        android:textColor="@color/dark_bg"
+                        android:textSize="12sp"
+                        android:background="@drawable/budget_button_background"
+                        android:layout_marginEnd="5dp" />
+
+                    <Button
+                        android:id="@+id/savingsTab"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="Savings"
+                        android:textColor="@color/dark_bg"
+                        android:textSize="12sp"
+                        android:background="@drawable/budget_button_background"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="5dp" />
+
+                    <Button
+                        android:id="@+id/wantsTab"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:text="Wants"
+                        android:textColor="@color/dark_bg"
+                        android:textSize="12sp"
+                        android:background="@drawable/budget_button_background"
+                        android:layout_marginStart="5dp" />
+                </LinearLayout>
+
+                <!-- Needs Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Needs *"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg" />
+
+                        <TextView
+                            android:id="@+id/needsPercentage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0%"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/needsInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="0.00"
+                        android:inputType="numberDecimal"
+                        android:textSize="16sp"
+                        android:textColor="@color/dark_bg"
+                        android:textColorHint="@color/placeholder"
+                        android:background="@drawable/input_background"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp" />
+                </LinearLayout>
+
+                <!-- Savings Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Savings *"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg" />
+
+                        <TextView
+                            android:id="@+id/savingsPercentage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0%"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/savingsInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="0.00"
+                        android:inputType="numberDecimal"
+                        android:textSize="16sp"
+                        android:textColor="@color/dark_bg"
+                        android:textColorHint="@color/placeholder"
+                        android:background="@drawable/input_background"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp" />
+                </LinearLayout>
+
+                <!-- Wants Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Wants *"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg" />
+
+                        <TextView
+                            android:id="@+id/wantsPercentage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0%"
+                            android:textSize="14sp"
+                            android:textColor="@color/dark_bg"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/wantsInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="0.00"
+                        android:inputType="numberDecimal"
+                        android:textSize="16sp"
+                        android:textColor="@color/dark_bg"
+                        android:textColorHint="@color/placeholder"
+                        android:background="@drawable/input_background"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp" />
+                </LinearLayout>
+
+                <!-- Add Category Button -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/input_background"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/addCategoryBtn"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/ic_add"
+                        android:contentDescription="Add Category"
+                        android:scaleType="centerInside" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Navigation Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <Button
+            android:id="@+id/finishBtn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Finish"
+            android:textColor="@color/dark_bg"
+            android:textStyle="bold"
+            android:background="@drawable/budget_button_background"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:id="@+id/backBtn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Back"
+            android:textColor="@color/dark_bg"
+            android:textStyle="bold"
+            android:background="@drawable/button_background" />
+    </LinearLayout>
+</LinearLayout>
+

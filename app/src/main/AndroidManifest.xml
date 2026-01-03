@@ -22,6 +22,11 @@
         <activity android:name=".Pin3Activity" />
         <activity android:name=".PINVerifyActivity" />
         <activity android:name=".DashboardActivity" />
+
+        <!-- Budget Plan Activities -->
+        <activity android:name=".budgetplan.BudgetPlanStep1Activity" />
+        <activity android:name=".budgetplan.BudgetPlanStep2Activity" />
+        <activity android:name=".budgetplan.BudgetPlanStep3Activity" />
     </application>
 
 </manifest>

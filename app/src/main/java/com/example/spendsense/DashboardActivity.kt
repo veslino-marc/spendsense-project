@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
 
+import com.example.spendsense.budgetplan.BudgetPlanStep1Activity
+
 class DashboardActivity : AppCompatActivity() {
     private lateinit var userManager: UserManager
     private lateinit var navHome: ImageView
@@ -62,9 +64,15 @@ class DashboardActivity : AppCompatActivity() {
         setupNavigation()
 
         // Action buttons
+        val createBudgetBtn: Button = findViewById(R.id.createBudgetBtn)
         val addExpenseBtn: Button = findViewById(R.id.addExpenseBtn)
         val addCashBtn: Button = findViewById(R.id.addCashBtn)
         val profileIcon: ImageView = findViewById(R.id.profileIcon)
+
+        // Create Budget Plan button
+        createBudgetBtn.setOnClickListener {
+            startActivity(Intent(this, BudgetPlanStep1Activity::class.java))
+        }
 
         addExpenseBtn.setOnClickListener {
             Toast.makeText(this, "Add Expense - Coming Soon", Toast.LENGTH_SHORT).show()
@@ -105,6 +113,7 @@ class DashboardActivity : AppCompatActivity() {
         navRecord.setColorFilter(Color.GRAY)
     }
 
+    @Suppress("MissingSuperCall")
     override fun onBackPressed() {
         showLogoutDialog()
     }
