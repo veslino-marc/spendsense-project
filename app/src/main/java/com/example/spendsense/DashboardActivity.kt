@@ -1,9 +1,9 @@
-// FILE: DashboardActivity.kt (UPDATED - WITH PIN CHECK ON RESTART)
 package com.example.spendsense
 
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -12,9 +12,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 
 import com.example.spendsense.budgetplan.BudgetPlanStep1Activity
 import com.example.spendsense.budgetplan.BudgetPlanStep3Activity
+import com.example.spendsense.budgetplan.data.AppDatabase
+import com.example.spendsense.budgetplan.data.Transaction
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 class DashboardActivity : AppCompatActivity() {
     private lateinit var userManager: UserManager
@@ -33,6 +39,9 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var budgetProgress: ProgressBar
     private lateinit var createBudgetBtn: Button
     private lateinit var customCategoriesDisplay: LinearLayout
+    private lateinit var recentTransactionsContainer: LinearLayout
+
+    private var totalBudgetAmount: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,10 +56,10 @@ class DashboardActivity : AppCompatActivity() {
             return
         }
 
-        // Check if coming from login/register flow (flag from Pin3Activity or LoginActivity)
+        // Check if coming from login/register flow
         val fromLogin = intent.getBooleanExtra("from_login", false)
 
-        // If NOT from login, ask for PIN (app restart scenario)
+        // If NOT from login, ask for PIN
         if (!fromLogin) {
             startActivity(Intent(this, PINVerifyActivity::class.java))
             finish()
@@ -84,15 +93,19 @@ class DashboardActivity : AppCompatActivity() {
         val profileIcon: ImageView = findViewById(R.id.profileIcon)
 
         addExpenseBtn.setOnClickListener {
-            Toast.makeText(this, "Add Expense - Coming Soon", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AddTransactionActivity::class.java)
+            intent.putExtra("type", "CASH_OUT")
+            startActivity(intent)
         }
 
         addCashBtn.setOnClickListener {
-            Toast.makeText(this, "Add Cash - Coming Soon", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AddTransactionActivity::class.java)
+            intent.putExtra("type", "CASH_IN")
+            startActivity(intent)
         }
 
         profileIcon.setOnClickListener {
-            Toast.makeText(this, "Profile - Coming Soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
 
         // Budget UI references
@@ -104,15 +117,21 @@ class DashboardActivity : AppCompatActivity() {
         wantsAmount = findViewById(R.id.wantsAmount)
         budgetProgress = findViewById(R.id.budgetProgress)
         customCategoriesDisplay = findViewById(R.id.customCategoriesDisplay)
+        
+        // Find or create container for dynamic recent transactions
+        // Note: I already updated the layout earlier to include recentTransactionsContainer
+        recentTransactionsContainer = findViewById(R.id.recentTransactionsContainer)
 
         // Populate budget plan if saved
         loadBudgetPlan()
+        
+        // Start observing database changes
+        observeTransactions()
     }
 
     private fun setupNavigation() {
         navHome.setOnClickListener {
             setHomeActive()
-            Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show()
         }
 
         navTrack.setOnClickListener {
@@ -122,7 +141,8 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         navAdd.setOnClickListener {
-            Toast.makeText(this, "Add - Coming Soon", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AddTransactionActivity::class.java)
+            startActivity(intent)
         }
 
         navRecord.setOnClickListener {
@@ -137,6 +157,70 @@ class DashboardActivity : AppCompatActivity() {
         navTrack.setColorFilter(Color.GRAY)
         navAdd.setColorFilter(Color.GRAY)
         navRecord.setColorFilter(Color.GRAY)
+    }
+
+    private fun observeTransactions() {
+        val db = AppDatabase.getDatabase(this)
+        val dao = db.transactionDao()
+
+        // Observe total cash out for budget tracking
+        lifecycleScope.launch {
+            dao.getTotalCashOut().collectLatest { used ->
+                updateBudgetDisplay(used ?: 0.0)
+            }
+        }
+
+        // Observe all transactions for recent list
+        lifecycleScope.launch {
+            dao.getAllTransactions().collectLatest { transactions ->
+                updateRecentTransactions(transactions)
+            }
+        }
+    }
+
+    private fun updateBudgetDisplay(used: Double) {
+        val df = DecimalFormat("#,###")
+        val percent = if (totalBudgetAmount > 0) ((used / totalBudgetAmount) * 100).toInt() else 0
+
+        budgetStatusAmount.text = "₱${df.format(used)} / ₱${df.format(totalBudgetAmount)}"
+        budgetStatusPercent.text = "$percent%"
+        budgetProgress.progress = percent.coerceIn(0, 100)
+
+        // Alert message
+        val alertText = when {
+            percent >= 90 -> "Budget Alert: You've used $percent% of your budget"
+            percent >= 75 -> "Heads up: $percent% of your budget used"
+            totalBudgetAmount == 0.0 -> "Create a budget plan to start tracking"
+            else -> "You're on track with your budget"
+        }
+        budgetAlertText.text = alertText
+    }
+
+    private fun updateRecentTransactions(transactions: List<Transaction>) {
+        recentTransactionsContainer.removeAllViews()
+        val df = DecimalFormat("#,###")
+        
+        // Show last 5
+        val displayList = transactions.take(5)
+        
+        for (tx in displayList) {
+            val view = LayoutInflater.from(this).inflate(R.layout.item_transaction, recentTransactionsContainer, false)
+            
+            val category: TextView = view.findViewById(R.id.txCategory)
+            val date: TextView = view.findViewById(R.id.txDate)
+            val amount: TextView = view.findViewById(R.id.txAmount)
+            
+            category.text = tx.category
+            date.text = tx.date
+            
+            val prefix = if (tx.type == "CASH_IN") "+" else "-"
+            val color = if (tx.type == "CASH_IN") Color.parseColor("#4CAF50") else Color.parseColor("#FF6B6B")
+            
+            amount.text = "${prefix}₱${df.format(tx.amount)}"
+            amount.setTextColor(color)
+            
+            recentTransactionsContainer.addView(view)
+        }
     }
 
     @Suppress("MissingSuperCall")
@@ -171,6 +255,7 @@ class DashboardActivity : AppCompatActivity() {
         val schedule = prefs.getString("schedule", null)
 
         val hasPlan = totalBudget != null && needs != null && savings != null && wants != null && schedule != null
+        totalBudgetAmount = totalBudget ?: 0.0
 
         createBudgetBtn.text = if (hasPlan) "See budget plan" else "Create a budget plan"
         createBudgetBtn.setOnClickListener {
@@ -200,28 +285,13 @@ class DashboardActivity : AppCompatActivity() {
             return
         }
 
-        val df = java.text.DecimalFormat("#,###")
-        val used = 0.0 // placeholder until expenses are tracked
-        val percent = if (totalBudget > 0) ((used / totalBudget) * 100).toInt() else 0
-
-        budgetStatusAmount.text = "₱${df.format(used)} / ₱${df.format(totalBudget)}"
-        budgetStatusPercent.text = "$percent%"
-        budgetProgress.progress = percent.coerceIn(0, 100)
-
+        val df = DecimalFormat("#,###")
         needsAmount.text = "₱${df.format(needs)}"
         savingsAmount.text = "₱${df.format(savings)}"
         wantsAmount.text = "₱${df.format(wants)}"
 
         // Load and display custom categories
         loadCustomCategories(prefs)
-
-        // Alert message
-        val alertText = when {
-            percent >= 90 -> "Budget Alert: You've used $percent% of your budget"
-            percent >= 75 -> "Heads up: $percent% of your budget used"
-            else -> "You're on track with your budget"
-        }
-        budgetAlertText.text = alertText
     }
 
     private fun loadCustomCategories(prefs: android.content.SharedPreferences) {
@@ -235,7 +305,7 @@ class DashboardActivity : AppCompatActivity() {
         // Simple JSON parsing for custom categories
         try {
             val customMap = parseCustomCategoriesJson(customCategoriesJson)
-            val df = java.text.DecimalFormat("#,###")
+            val df = DecimalFormat("#,###")
 
             for ((categoryName, amount) in customMap) {
                 val categoryLayout = LinearLayout(this).apply {

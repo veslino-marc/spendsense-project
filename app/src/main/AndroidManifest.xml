@@ -22,8 +22,10 @@
         <activity android:name=".Pin3Activity" />
         <activity android:name=".PINVerifyActivity" />
         <activity android:name=".DashboardActivity" />
+        <activity android:name=".AddTransactionActivity" />
         <activity android:name=".AnalyticsActivity" />
         <activity android:name=".HistoryActivity" />
+        <activity android:name=".ProfileActivity" />
 
         <!-- Budget Plan Activities -->
         <activity android:name=".budgetplan.BudgetPlanStep1Activity" />
