@@ -116,7 +116,9 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         navTrack.setOnClickListener {
-            Toast.makeText(this, "Track - Coming Soon", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AnalyticsActivity::class.java)
+            intent.putExtra("from_login", true)
+            startActivity(intent)
         }
 
         navAdd.setOnClickListener {
@@ -124,7 +126,9 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         navRecord.setOnClickListener {
-            Toast.makeText(this, "Record - Coming Soon", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, HistoryActivity::class.java)
+            intent.putExtra("from_login", true)
+            startActivity(intent)
         }
     }
 
