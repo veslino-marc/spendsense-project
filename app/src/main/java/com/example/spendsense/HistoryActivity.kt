@@ -52,7 +52,7 @@ class HistoryActivity : AppCompatActivity() {
 
         val profileIcon: ImageView = findViewById(R.id.profileIcon)
         profileIcon.setOnClickListener {
-            Toast.makeText(this, "Profile - Coming Soon", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
 
         loadAndRender()
@@ -79,6 +79,8 @@ class HistoryActivity : AppCompatActivity() {
         }
 
         navAdd.setOnClickListener {
+            val intent = Intent(this, AddTransactionActivity::class.java)
+            startActivity(intent)
         }
 
         navRecord.setOnClickListener {

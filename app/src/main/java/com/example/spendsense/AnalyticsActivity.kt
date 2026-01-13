@@ -63,6 +63,8 @@ class AnalyticsActivity : AppCompatActivity() {
         }
 
         navAdd.setOnClickListener {
+            val intent = Intent(this, AddTransactionActivity::class.java)
+            startActivity(intent)
         }
 
         navRecord.setOnClickListener {
@@ -70,6 +72,12 @@ class AnalyticsActivity : AppCompatActivity() {
             intent.putExtra("from_login", true)
             startActivity(intent)
             finish()
+        }
+
+        // Add profile navigation
+        val profileIcon: ImageView = findViewById(R.id.profileIcon)
+        profileIcon.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
     }
 

@@ -65,4 +65,16 @@ class UserManager(context: Context) {
     fun clearAllData() {
         prefs.edit().clear().apply()
     }
+
+    fun updateUsername(newUsername: String) {
+        prefs.edit().putString(KEY_USERNAME, newUsername).apply()
+    }
+
+    fun verifyPassword(password: String): Boolean {
+        return getPassword() == password
+    }
+
+    fun updatePassword(newPassword: String) {
+        prefs.edit().putString(KEY_PASSWORD, newPassword).apply()
+    }
 }

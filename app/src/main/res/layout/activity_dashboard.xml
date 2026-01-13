@@ -110,7 +110,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="You've used 85% of your monthly budget"
+                    android:text="You're on track with your budget"
                     android:textSize="14sp"
                     android:textColor="@color/dark_bg" />
             </LinearLayout>
@@ -308,90 +308,11 @@
                     android:textColor="@color/dark_bg"
                     android:layout_marginBottom="15dp" />
 
-                <!-- Transaction Item 1 -->
                 <LinearLayout
+                    android:id="@+id/recentTransactionsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="15dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Food &amp; Dining"
-                        android:textSize="14sp"
-                        android:textColor="@color/dark_bg" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Today, 10:30 PM"
-                        android:textSize="12sp"
-                        android:textColor="@color/placeholder" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="20dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="-₱480"
-                        android:textSize="14sp"
-                        android:textColor="#FF6B6B"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <!-- Transaction Item 2 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="15dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Transportation"
-                        android:textSize="14sp"
-                        android:textColor="@color/dark_bg" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Today, 3:14 PM"
-                        android:textSize="12sp"
-                        android:textColor="@color/placeholder" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="-₱250"
-                        android:textSize="14sp"
-                        android:textColor="#FF6B6B"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                    android:orientation="vertical" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
